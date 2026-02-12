@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# Capacitor
+/mobile-app/android/app/build/
+/mobile-app/android/app/src/main/assets/public/
+/mobile-app/node_modules/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Android artifacts
+*.apk
+*.aar
+*.jks
+!/mobile-app/Final Build/**
+captures/
+.externalNativeBuild
+.cxx
+local.properties
+

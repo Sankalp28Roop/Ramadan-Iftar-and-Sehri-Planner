@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+:root {
+  --background: #041c04;
+  --foreground: #f0f6fc;
+  --primary: #10b981;
+  /* Brighter Gold inspired by the image */
+  --secondary: #f6e05e;
+  --accent: #edc948;
+  --gold-highlight: #fffef2;
+  --gold-shadow: #b7791f;
+  --success: #3fb950;
+  --card-bg: rgba(4, 28, 4, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Safe Area Insets for Mobile */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+}
+
+body {
+  background: radial-gradient(circle at 50% -20%, #06402b, #021402);
+  color: var(--foreground);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-attachment: fixed;
+}
+
+/* Constellation Pattern Overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.glass {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* Brighter, more metallic gold gradient */
+.gold-text {
+  background: linear-gradient(to bottom,
+      #fffef2 0%,
+      #f6e05e 20%,
+      #d69e2e 50%,
+      #f6e05e 80%,
+      #fffef2 100%);
+  background-size: 100% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 8px rgba(246, 224, 94, 0.3));
+}
+
+.gold-glow {
+  box-shadow: 0 0 30px rgba(246, 224, 94, 0.2);
+}
+
+/* Shiny Gold Shine Animation */
+.shiny-gold {
+  position: relative;
+  overflow: hidden;
+}
+
+.shiny-gold::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      transparent 45%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 55%);
+  transform: rotate(45deg);
+  animation: shine-effect 3s infinite;
+}
+
+@keyframes shine-effect {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000814;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #06402b;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #065f46;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    background-color: #041c04 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .gold-text {
+    background: linear-gradient(to right, #f6e05e, #ed8936) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    print-color-adjust: exact !important;
+  }
+
+  main {
+    padding: 20px !important;
+    width: 100% !important;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
