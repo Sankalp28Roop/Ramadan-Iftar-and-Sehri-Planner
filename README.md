@@ -16,24 +16,6 @@
 
 ---
 
-## 🖼️ App Screenshots
-
-### 💻 Desktop View
-<p align="center">
-  <img src="images/landing.png" width="32%" />
-  <img src="images/dashboard.png" width="32%" />
-  <img src="images/listtodo.png" width="32%" />
-</p>
-
-### 📱 Mobile View
-<p align="center">
-  <img src="images/landingresponsive.png" width="30%" />
-  <img src="images/responsive dashboard.png" width="30%" />
-  <img src="images/shoppingresponsivelis.png" width="30%" />
-</p>
-
----
-
 ## ✨ Key Features
 
 - 🧠 **Dynamic Planning**: Personalized meal suggestions based on nutritional needs.
