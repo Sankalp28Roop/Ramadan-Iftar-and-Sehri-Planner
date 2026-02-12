@@ -1,4 +1,4 @@
-<p align center="center">
+<p align="center">
   <img src="images/banner.png" alt="SehriMilan Banner" width="100%">
 </p>
 
@@ -15,6 +15,7 @@
 **SehriMilan** is a premium, open-source Ramadan Assistant designed to elevate your spiritual journey. From personalized Iftar and Sehri planning to nutrition insights and real-time shopping lists, it’s the only companion you need this Ramadan.
 
 ---
+
 ## 🖼️ App Screenshots
 
 ### 💻 Desktop View
@@ -41,6 +42,7 @@
 - 🔐 **Secure Auth**: Supabase-powered authentication for personalized data persistence.
 - 📱 **Cross-Platform**: Seamless experience on Web and Android (Native APK available).
 - 🎨 **Premium UI/UX**: Cinematic glassmorphism design with royal purple and gold aesthetics.
+- ⚡ **Local Caching**: Instant load times with background cloud synchronization.
 
 ---
 
@@ -48,6 +50,7 @@
 
 - **Frontend**: Next.js 15 (App Router), TypeScript, Framer Motion, Tailwind CSS
 - **Backend/DB**: Supabase (Auth & PostgreSQL)
+- **AI/LLM**: Google Gemini API (for plan generation)
 - **Mobile Foundation**: Capacitor.js
 - **Design**: Vanilla CSS & custom micro-animations
 
@@ -60,23 +63,36 @@
 - Node.js (v18+)
 - Java 17 (for Android builds)
 - Supabase Account (for database & auth)
+- Google AI Studio API Key (for Gemini)
 
 ### Installation
 
 1. **Clone the repo:**
    ```bash
-   git clone https://github.com/Munib-Jahangir/Ramadan-Iftar-and-Sehri-Planner-AI.git
-   cd Ramadan-Iftar-and-Sehri-Planner-AI
+   git clone https://github.com/Sankalp28Roop/Ramadan-Iftar-and-Sehri-Planner.git
+   cd Ramadan-Iftar-and-Sehri-Planner
    ```
 
 2. **Web Setup:**
    ```bash
    cd web
    npm install
+   ```
+
+3. **Configure Environment:**
+   Create a `.env.local` file in the `web` directory:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
+   ```
+
+4. **Run Development Server:**
+   ```bash
    npm run dev
    ```
 
-3. **Android Build:**
+5. **Android Build:**
    ```bash
    cd ../mobile-app
    npm install
@@ -88,10 +104,9 @@
 
 ## 📱 Mobile App (Android)
 
-The app is optimized for Android, featuring:
+The app is optimized for Android via Capacitor, featuring:
 - **Custom Splash Screen**: Cinematic entry with the SehriMilan emblem.
-- **Easter Egg**: A special tribute to the creator on launch.
-- **Offline Readiness**: Fast loading with static export optimization.
+- **Offline Readiness**: Fast loading with static export optimization and local storage caching.
 
 ---
 
@@ -101,9 +116,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 👨‍💻 Created By
 
-**Munib Jahangir**
-- [GitHub](https://github.com/Munib-Jahangir)
-- [LinkedIn](https://www.linkedin.com/in/munibjahangir/)
+**Sankalp Swaroop**
+- [GitHub](https://github.com/Sankalp28Roop)
+- [LinkedIn](https://www.linkedin.com/in/sankalp-swaroop-34a749209/)
 
 ---
 
