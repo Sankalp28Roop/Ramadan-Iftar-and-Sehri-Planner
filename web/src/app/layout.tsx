@@ -49,6 +49,7 @@ export default function RootLayout({
               {children}
             </main>
           </div>
+          <NurChat />
         </AuthProvider>
       </body>
     </html>
