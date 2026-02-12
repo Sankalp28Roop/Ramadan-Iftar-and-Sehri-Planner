@@ -34,6 +34,8 @@ export default function LandingPage() {
     ageGroups: "All ages",
     healthGoals: "Balanced Diet",
     dietaryNotes: "None",
+    likedFoods: "Dates, Chicken, Rice",
+    avoidFoods: "Extreme Spice, Heavy Oils",
   });
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -111,6 +113,8 @@ export default function LandingPage() {
         - Style: ${formData.cuisineType}.
         - Health Goals: ${formData.healthGoals}.
         - Dietary Restrictions: ${formData.dietaryNotes}.
+        - Preferred Items (Include these): ${formData.likedFoods}.
+        - Exclude Items (AVOID these): ${formData.avoidFoods}.
 
         IMPORTANT: Use Markdown headings (##) for Suhoor, Iftar, Preparation, and Shopping List sections. Focus on variety and nutritional balance.`;
 
@@ -278,17 +282,17 @@ export default function LandingPage() {
 
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Cuisine Style</label>
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Preferred Foods</label>
                   <div className="relative group">
-                    <ChefHat className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
-                    <input id="cuisineType" type="text" value={formData.cuisineType} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Desi, Arab, Healthy" />
+                    <Star className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="likedFoods" type="text" value={formData.likedFoods} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Chicken, Lentils, Dates" />
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Age Groups</label>
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Excluded Items</label>
                   <div className="relative group">
-                    <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
-                    <input id="ageGroups" type="text" value={formData.ageGroups} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Adults, Kids, Elders" />
+                    <Zap className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="avoidFoods" type="text" value={formData.avoidFoods} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Nuts, Dairy, Sugar" />
                   </div>
                 </div>
               </div>
@@ -306,6 +310,23 @@ export default function LandingPage() {
                   <div className="relative group">
                     <ChefHat className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
                     <input id="dietaryNotes" type="text" value={formData.dietaryNotes} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="No Spicy, Sugar-Free" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Cuisine Style</label>
+                  <div className="relative group">
+                    <ChefHat className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="cuisineType" type="text" value={formData.cuisineType} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Desi, Arab, Healthy" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Age Groups</label>
+                  <div className="relative group">
+                    <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="ageGroups" type="text" value={formData.ageGroups} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Adults, Kids, Elders" />
                   </div>
                 </div>
               </div>
