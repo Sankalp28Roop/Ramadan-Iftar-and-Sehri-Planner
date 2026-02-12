@@ -140,12 +140,14 @@ export default function NurChat() {
                                     className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                                 >
                                     <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${m.role === "user"
-                                            ? "bg-secondary text-black font-medium"
-                                            : "bg-white/5 text-emerald-50 border border-white/5"
+                                        ? "bg-secondary text-black font-medium"
+                                        : "bg-white/5 text-emerald-50 border border-white/5"
                                         }`}>
-                                        <ReactMarkdown className="prose prose-invert prose-sm">
-                                            {m.content}
-                                        </ReactMarkdown>
+                                        <div className="prose prose-invert prose-sm">
+                                            <ReactMarkdown>
+                                                {m.content}
+                                            </ReactMarkdown>
+                                        </div>
                                     </div>
                                 </div>
                             ))}

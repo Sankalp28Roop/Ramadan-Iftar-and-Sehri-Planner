@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import NurChat from "@/components/NurChat";
 import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
