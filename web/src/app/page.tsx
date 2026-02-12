@@ -27,13 +27,13 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [formData, setFormData] = useState({
-    familySize: "0",
-    dailyBudget: "0",
-    days: "0",
+    familySize: "1",
+    dailyBudget: "500",
+    days: "7",
     cuisineType: "Indian Desi",
-    ageGroups: "Adults and kids",
-    equipment: "Stove, Oven",
-    foodItems: "Chicken, Lentils, Dates",
+    ageGroups: "All ages",
+    healthGoals: "Balanced Diet",
+    dietaryNotes: "None",
   });
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -51,7 +51,7 @@ export default function LandingPage() {
     setIsLoaded(true);
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     if (id === "days") {
       const val = parseInt(value);
@@ -105,8 +105,14 @@ export default function LandingPage() {
         - [Generic Item 1]
         - [Generic Item 2]
 
-        Context: Family of ${formData.familySize}, Budget INR ${formData.dailyBudget}/day, ${formData.cuisineType} style.
-        IMPORTANT: Use Markdown headings (##) for Suhoor, Iftar, Preparation, and Shopping List sections.`;
+        CONTEXT:
+        - Population: Family of ${formData.familySize} (${formData.ageGroups}).
+        - Budget: INR ${formData.dailyBudget}/day.
+        - Style: ${formData.cuisineType}.
+        - Health Goals: ${formData.healthGoals}.
+        - Dietary Restrictions: ${formData.dietaryNotes}.
+
+        IMPORTANT: Use Markdown headings (##) for Suhoor, Iftar, Preparation, and Shopping List sections. Focus on variety and nutritional balance.`;
 
         websocket.addEventListener("open", () => {
           websocket.send(JSON.stringify({ appId: "early-ahead", prompt }));
@@ -270,11 +276,37 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Kitchen Preferences</label>
-                <div className="relative group">
-                  <ChefHat className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
-                  <input id="cuisineType" type="text" value={formData.cuisineType} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Desi, Arab, Healthy" />
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Cuisine Style</label>
+                  <div className="relative group">
+                    <ChefHat className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="cuisineType" type="text" value={formData.cuisineType} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Desi, Arab, Healthy" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Age Groups</label>
+                  <div className="relative group">
+                    <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="ageGroups" type="text" value={formData.ageGroups} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Adults, Kids, Elders" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Health Goal</label>
+                  <div className="relative group">
+                    <Star className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="healthGoals" type="text" value={formData.healthGoals} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Weight Loss, High Protein" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Dietary Notes</label>
+                  <div className="relative group">
+                    <ChefHat className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="dietaryNotes" type="text" value={formData.dietaryNotes} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="No Spicy, Sugar-Free" />
+                  </div>
                 </div>
               </div>
             </div>
