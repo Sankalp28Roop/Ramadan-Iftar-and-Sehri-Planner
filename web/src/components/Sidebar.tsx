@@ -75,7 +75,7 @@ const Sidebar = () => {
             </div>
 
             {/* Mobile Bottom Navigation (Solid Premium Color) */}
-            <div className="xl:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] bg-[#021402] border border-white/10 p-3 rounded-[2.5rem] flex items-center justify-around z-50 no-print shadow-[0_-10px_40px_rgba(0,0,0,0.6)]">
+            <div className="xl:hidden fixed bottom-[env(safe-area-inset-bottom)] left-1/2 -translate-x-1/2 w-full max-w-[92%] bg-[#021402] border border-white/10 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] rounded-t-[2.5rem] flex items-center justify-around z-[60] no-print shadow-[0_-10px_40px_rgba(0,0,0,0.6)]">
                 {menuItems.map((item) => {
                     const isActive = pathname === item.path;
                     return (

@@ -12,13 +12,16 @@ import {
     Zap,
     Star,
     Flame,
-    Loader2
+    Loader2,
+    Moon,
+    MapPin
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { getTodaysPrayerTimes, getCachedPrayerTimes, cachePrayerTimes, type PrayerTimesResponse } from "@/lib/prayerTimes";
 
 export default function Dashboard() {
     const { user, loading: authLoading, isDemo } = useAuth();
@@ -30,6 +33,9 @@ export default function Dashboard() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [prayerTimes, setPrayerTimes] = useState<PrayerTimesResponse | null>(null);
+    const [city, setCity] = useState<string>("Delhi");
+    const [country, setCountry] = useState<string>("India");
 
     // Initial load from cache
     useEffect(() => {
@@ -54,6 +60,18 @@ export default function Dashboard() {
     const fetchPlan = React.useCallback(async () => {
         if (!user) return;
         if (isDemo) {
+            // Try to load city/country from local storage if available for demo users
+            const savedData = localStorage.getItem("sehrimilan_form_data");
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed.city) setCity(parsed.city);
+                    if (parsed.country) setCountry(parsed.country);
+                } catch (e) {
+                    console.error("Error loading demo form data:", e);
+                }
+            }
+
             // ... demo plan logic ...
             const demoPlan = `
 # Day 1
@@ -110,11 +128,25 @@ export default function Dashboard() {
 
             if (dbError) {
                 if (dbError.code !== "PGRST116") {
-                    console.error("Error fetching plan:", {
-                        code: dbError.code,
-                        message: dbError.message,
-                        details: dbError.details
-                    });
+                    console.error("Error fetching plan:", dbError.message);
+
+                    // Fallback to local storage if DB fetch fails
+                    const cachedPlan = localStorage.getItem(`sehrimilan_plan_${user.id}`);
+                    const cachedDays = localStorage.getItem(`sehrimilan_plan_days_${user.id}`);
+
+                    if (cachedPlan) {
+                        try {
+                            const blocks = cachedPlan.split(/(?=# (?:Day|Day:)\s*\d+)|(?=## (?:Day|Day:)\s*\d+)/i)
+                                .filter((p: string) => p.trim().length > 0 && p.toLowerCase().includes("day"));
+                            setDayContent(blocks);
+                            setDays(parseInt(cachedDays || "0"));
+                            setLoading(false);
+                            return; // Successfully loaded from cache
+                        } catch (e) {
+                            console.error("Error parsing cached plan:", e);
+                        }
+                    }
+
                     setError(`Failed to fetch your plan: ${dbError.message}`);
                 } else {
                     // Plan actually doesn't exist anymore, clear cache
@@ -123,18 +155,23 @@ export default function Dashboard() {
                     setDayContent([]);
                     setDays(0);
                 }
+                setLoading(false);
                 return;
             }
 
             if (data) {
                 const fullPlan = data.full_plan || "";
                 const savedDays = parseInt(data.plan_days || "0");
+                const savedCity = data.city || "Delhi";
+                const savedCountry = data.country || "India";
 
                 // Save to cache
                 localStorage.setItem(`sehrimilan_plan_${user.id}`, fullPlan);
                 localStorage.setItem(`sehrimilan_plan_days_${user.id}`, savedDays.toString());
 
                 setDays(isNaN(savedDays) ? 0 : savedDays);
+                setCity(savedCity);
+                setCountry(savedCountry);
 
                 if (typeof fullPlan === "string" && fullPlan.trim().length > 0) {
                     const blocks = fullPlan.split(/(?=# (?:Day|Day:)\s*\d+)|(?=## (?:Day|Day:)\s*\d+)/i)
@@ -159,6 +196,32 @@ export default function Dashboard() {
         }
     }, [user, fetchPlan]);
 
+    // Fetch prayer times when city/country is available
+    useEffect(() => {
+        const fetchPrayerTimesData = async () => {
+            if (!city || !country) return;
+
+            // Try to get cached times first
+            const cached = getCachedPrayerTimes(city, country);
+            if (cached) {
+                setPrayerTimes(cached);
+                return;
+            }
+
+            // Fetch fresh times
+            try {
+                const times = await getTodaysPrayerTimes(city, country);
+                setPrayerTimes(times);
+                cachePrayerTimes(times);
+            } catch (err) {
+                console.error("Error fetching prayer times:", err);
+                // Don't show error to user, just skip prayer times display
+            }
+        };
+
+        fetchPrayerTimesData();
+    }, [city, country]);
+
     const clearPlan = async () => {
         if (!user || isDemo) return;
         if (confirm("Are you sure you want to clear your plan from the cloud?")) {
@@ -182,14 +245,27 @@ export default function Dashboard() {
 
     if (!mounted || authLoading || (loading && user)) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-[#041c04] text-white">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#041c04] text-white px-4">
                 <Loader2 className="w-12 h-12 text-secondary animate-spin mb-4" />
                 <p className="text-emerald-100/40 font-black uppercase tracking-widest">Syncing with Cloud...</p>
             </div>
         );
     }
 
-    if (!user) return null;
+    if (!user) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#041c04] text-white px-4 text-center">
+                <div className="p-6 bg-secondary/10 rounded-3xl border border-secondary/20 shadow-2xl shadow-secondary/20 mb-6">
+                    <Moon className="text-secondary w-16 h-16 animate-pulse filter drop-shadow-[0_0_15px_rgba(246,224,94,0.5)]" />
+                </div>
+                <h2 className="text-2xl font-black gold-text tracking-widest uppercase mb-4">Authentication Required</h2>
+                <p className="text-emerald-100/60 text-sm mb-8 max-w-md">Please login or try our demo mode to access your personalized Ramadan meal planner.</p>
+                <a href="/" className="px-8 py-4 bg-secondary text-black font-black rounded-full hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-sm shadow-lg shadow-secondary/20">
+                    Return to Home
+                </a>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen px-4 lg:px-20 py-8 lg:py-12 pb-32 lg:pb-12 bg-transparent text-foreground relative">
@@ -233,6 +309,55 @@ export default function Dashboard() {
                     )}
                 </div>
             </header>
+
+            {/* Prayer Times Card */}
+            {prayerTimes && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass p-6 lg:p-8 rounded-[2.5rem] lg:rounded-[3rem] border-white/5 mb-10 lg:mb-16 relative z-10 overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-secondary/5 blur-[80px] -z-10 pointer-events-none"></div>
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
+                        <div className="flex items-center gap-3 lg:gap-4">
+                            <div className="p-3 lg:p-4 bg-secondary/10 rounded-2xl">
+                                <Moon className="w-6 h-6 lg:w-8 lg:h-8 text-secondary fill-secondary" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] lg:text-xs text-emerald-100/40 font-black uppercase tracking-widest">Prayer Times</p>
+                                <div className="flex items-center gap-2 text-emerald-100/60">
+                                    <MapPin className="w-3 h-3 lg:w-4 lg:h-4" />
+                                    <p className="text-xs lg:text-sm font-bold">{city}, {country}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 lg:flex lg:flex-row gap-6 lg:gap-12 w-full lg:w-auto">
+                            <div className="text-center lg:text-left">
+                                <p className="text-[10px] lg:text-xs text-secondary font-black uppercase tracking-widest mb-2">Sehri (Fajr)</p>
+                                <p className="text-2xl lg:text-4xl font-black text-white tracking-tight">{prayerTimes.fajr}</p>
+                            </div>
+                            <div className="hidden lg:block w-[1px] h-12 bg-white/10"></div>
+
+                            <div className="text-center lg:text-left">
+                                <p className="text-[10px] lg:text-xs text-secondary font-black uppercase tracking-widest mb-2">Dhuhr</p>
+                                <p className="text-2xl lg:text-4xl font-black text-white tracking-tight">{prayerTimes.dhuhr}</p>
+                            </div>
+                            <div className="hidden lg:block w-[1px] h-12 bg-white/10"></div>
+
+                            <div className="text-center lg:text-left">
+                                <p className="text-[10px] lg:text-xs text-secondary font-black uppercase tracking-widest mb-2">Asr</p>
+                                <p className="text-2xl lg:text-4xl font-black text-white tracking-tight">{prayerTimes.asr}</p>
+                            </div>
+                            <div className="hidden lg:block w-[1px] h-12 bg-white/10"></div>
+
+                            <div className="text-center lg:text-left">
+                                <p className="text-[10px] lg:text-xs text-secondary font-black uppercase tracking-widest mb-2">Iftar (Maghrib)</p>
+                                <p className="text-2xl lg:text-4xl font-black text-white tracking-tight">{prayerTimes.maghrib}</p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 relative z-10">
                 {/* Day Selector - Horizontal on Mobile */}

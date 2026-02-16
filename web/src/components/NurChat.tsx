@@ -98,7 +98,7 @@ export default function NurChat() {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-[100] no-print">
+        <div className="fixed bottom-20 right-4 xl:bottom-6 xl:right-6 z-[55] no-print">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div

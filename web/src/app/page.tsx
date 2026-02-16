@@ -15,11 +15,13 @@ import {
   Zap,
   Star,
   LogIn,
-  UserPlus
+  UserPlus,
+  MapPin
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { generateFallbackPlan } from "@/lib/fallbackPlan";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -36,6 +38,8 @@ export default function LandingPage() {
     dietaryNotes: "None",
     likedFoods: "Dates, Chicken, Rice",
     avoidFoods: "Extreme Spice, Heavy Oils",
+    city: "Delhi",
+    country: "India",
   });
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -151,6 +155,8 @@ export default function LandingPage() {
             id: user.id,
             full_plan: fullPlan,
             plan_days: formData.days,
+            city: formData.city,
+            country: formData.country,
             updated_at: new Date().toISOString()
           });
         if (dbError) throw dbError;
@@ -164,13 +170,56 @@ export default function LandingPage() {
 
       router.push("/dashboard");
     } catch (err) {
-      console.error("Parallel generation error:", err);
-      // Fallback: If any segment fails, it will trigger the catch block. 
-      // In a real app we might want to retry failed segments, but for now we error out.
-      setStatus("Sync Failed. Please try again.");
+      console.warn("AI Service unavailable (using fallback):", err);
+      setStatus("AI Service Busy. Generating Offline Template...");
+
+      // Fallback: Use local generator
+      try {
+        const fallbackPlan = generateFallbackPlan(formData);
+
+        // Always save to localStorage as a safety net
+        if (user) {
+          localStorage.setItem(`sehrimilan_plan_${user.id}`, fallbackPlan);
+          localStorage.setItem(`sehrimilan_plan_days_${user.id}`, formData.days);
+        }
+
+        if (user) {
+          try {
+            const { error: dbError } = await supabase
+              .from("plans")
+              .upsert({
+                id: user.id,
+                full_plan: fallbackPlan,
+                plan_days: formData.days,
+                city: formData.city,
+                country: formData.country,
+                updated_at: new Date().toISOString()
+              });
+
+            if (dbError) {
+              console.warn("Supabase save failed, using local storage backup:", dbError);
+              // We don't throw here, just proceed with local storage data
+            } else {
+              // Only try to clear shopping list if plan save succeeded
+              await supabase
+                .from("shopping_lists")
+                .delete()
+                .eq("id", user.id);
+            }
+          } catch (dbEx) {
+            console.warn("Database operation failed completely:", dbEx);
+            // Proceed anyway because we saved to localStorage
+          }
+        }
+
+        setTimeout(() => router.push("/dashboard"), 1000);
+      } catch (fbError) {
+        console.error("Critical Fallback error:", fbError);
+        setStatus("System Error. Please try again.");
+      }
     } finally {
-      setLoading(false);
-      // Don't clear status immediately so user can see failures if they happen
+      if (!user) setLoading(false);
+      // Don't clear status immediately so user can see messages
     }
   };
 
@@ -327,6 +376,29 @@ export default function LandingPage() {
                   <div className="relative group">
                     <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
                     <input id="ageGroups" type="text" value={formData.ageGroups} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Adults, Kids, Elders" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">City</label>
+                  <div className="relative group">
+                    <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input list="city-options" id="city" type="text" value={formData.city} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="Select or Type City" />
+                    <datalist id="city-options">
+                      <option value="Kolkata" />
+                      <option value="Delhi" />
+                      <option value="Mumbai" />
+                      <option value="Bengaluru" />
+                    </datalist>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-emerald-100/40 tracking-widest uppercase ml-1">Country</label>
+                  <div className="relative group">
+                    <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 group-focus-within:text-secondary transition-colors" />
+                    <input id="country" type="text" value={formData.country} onChange={handleInputChange} className="w-full bg-white/5 border border-white/5 rounded-[2rem] py-5 pl-14 pr-4 text-white focus:border-secondary transition-all outline-none font-bold text-lg" placeholder="India, UAE, Pakistan" />
                   </div>
                 </div>
               </div>
